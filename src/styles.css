@@ -113,6 +113,19 @@ button:disabled {
   background: #5847bd;
 }
 
+.button--secondary {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 1px solid #dbe1ea;
+  background: #fff;
+  color: #475569;
+}
+
+.button--secondary:hover:not(:disabled) {
+  border-color: #6d5bd0;
+  color: #6d5bd0;
+}
+
 .button--text {
   padding: 8px 0;
   background: transparent;
@@ -124,6 +137,63 @@ button:disabled {
   margin: 0 0 22px;
   color: #8490a3;
   font-size: 0.9rem;
+}
+
+.pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 32px;
+  color: #64748b;
+}
+
+.pagination__summary {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.pagination__controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+}
+
+.page-button {
+  min-width: 42px;
+  height: 42px;
+  padding: 0 10px;
+  border: 1px solid #dbe1ea;
+  background: #fff;
+  color: #475569;
+}
+
+.page-button:hover:not(:disabled) {
+  border-color: #6d5bd0;
+  color: #6d5bd0;
+}
+
+.page-button--active {
+  border-color: #6d5bd0;
+  background: #6d5bd0;
+  color: #fff;
+  box-shadow: 0 5px 12px rgb(109 91 208 / 22%);
+}
+
+.page-button--active:hover:not(:disabled) {
+  color: #fff;
+}
+
+.page-button--wide {
+  min-width: 78px;
+}
+
+.pagination__ellipsis {
+  padding: 0 3px;
+  color: #94a3b8;
 }
 
 .pokemon-grid {
@@ -336,5 +406,15 @@ button:disabled {
 
   .pokemon-stats {
     grid-template-columns: 1fr;
+  }
+
+  .page-button {
+    min-width: 38px;
+    height: 38px;
+    padding: 0 8px;
+  }
+
+  .page-button--wide {
+    min-width: 70px;
   }
 }

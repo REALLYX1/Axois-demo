@@ -1,6 +1,6 @@
 # React Axios Pokédex Demo
 
-Project nhỏ giúp người mới học cách React gọi một API công khai bằng Axios. Ứng dụng tải danh sách Pokémon, hỗ trợ tìm kiếm, tải lại dữ liệu và gọi thêm endpoint khi xem chi tiết.
+Project nhỏ giúp người mới học cách React gọi một API công khai bằng Axios. Ứng dụng tải danh sách Pokémon theo từng trang, hỗ trợ tìm theo tên hoặc chính xác theo cú pháp `#số`, tải lại dữ liệu và gọi thêm endpoint khi xem chi tiết.
 
 ## Công nghệ
 
@@ -33,7 +33,7 @@ npm run preview
 Project dùng [PokéAPI](https://pokeapi.co), một REST API miễn phí có dữ liệu Pokémon bằng tiếng Anh. API dùng HTTPS, không cần tài khoản hoặc API key. Hai endpoint đang dùng là:
 
 ```text
-GET https://pokeapi.co/api/v2/pokemon?limit=30
+GET https://pokeapi.co/api/v2/pokemon?limit=30&offset=0
 GET https://pokeapi.co/api/v2/pokemon/{name}
 ```
 
@@ -43,13 +43,13 @@ PokéAPI phù hợp vì dữ liệu dễ nhận biết, có ảnh minh họa và
 
 1. Khi `HomePage` xuất hiện, hook `usePokemon` chạy `fetchPokemon` trong `useEffect`.
 2. `fetchPokemon` gọi `getPokemonList` trong `src/api/pokemonApi.js`.
-3. Hàm API dùng `axiosClient.get("/pokemon")` và truyền `limit: 30` qua `params`.
+3. Hàm API dùng `axiosClient.get("/pokemon")`, truyền `limit: 30` và tính `offset = (page - 1) * limit` qua `params`.
 4. Axios ghép endpoint với `baseURL` đã cấu hình trong `axiosClient.js`.
 5. Khi API trả dữ liệu, hook lưu kết quả vào state `pokemon`; React render lại danh sách.
 6. Khi bấm một item, `usePokemonDetails` gọi `/pokemon/{name}` và hiển thị ảnh, loại, chiều cao và cân nặng.
 6. Nếu request lỗi, `catch` lưu thông báo vào state `error`. Khối `finally` luôn tắt trạng thái `loading`.
 
-Nút **Tải lại** gọi lại cùng hàm `fetchPokemon`. Ô tìm kiếm chỉ lọc 30 Pokémon đã tải ở trình duyệt, không gửi thêm request API.
+Nút **Tải lại** gọi lại cùng hàm `fetchPokemon`. Các nút số trang, **Trước** và **Sau** đổi state `page`, khiến hook gọi API lại với `offset` mới. Phân trang hiển thị ba trang trước và ba trang sau trang hiện tại. Tìm theo tên lọc trang hiện tại; nhập số Pokédex có dấu `#`, ví dụ `#001` hoặc `#25`, sẽ được chuẩn hóa thành ID số rồi gọi trực tiếp `/pokemon/1` hoặc `/pokemon/25` nên không phụ thuộc vị trí phân trang.
 
 ## Cấu trúc thư mục
 
@@ -61,7 +61,8 @@ src/
 ├── components/
 │   ├── PokemonCard.jsx  # Một thẻ Pokémon
 │   ├── PokemonDetail.jsx# Hộp thoại chi tiết
-│   └── PokemonList.jsx  # Danh sách Pokémon
+│   ├── PokemonList.jsx  # Danh sách Pokémon
+│   └── Pagination.jsx   # Nút chuyển trang
 ├── hooks/
 │   ├── usePokemon.js    # Request danh sách, loading và error
 │   └── usePokemonDetails.js # Request chi tiết một Pokémon
