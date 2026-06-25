@@ -31,7 +31,7 @@ export default function Pagination({ page, totalPages, loading, onPageChange }) 
             >
               1
             </button>
-            {firstVisiblePage > 2 && <span className="pagination__ellipsis">…</span>}
+            {firstVisiblePage > 2 && <span className="pagination__ellipsis">...</span>}
           </>
         )}
 
@@ -50,7 +50,7 @@ export default function Pagination({ page, totalPages, loading, onPageChange }) 
         {lastVisiblePage < totalPages && (
           <>
             {lastVisiblePage < totalPages - 1 && (
-              <span className="pagination__ellipsis">…</span>
+              <span className="pagination__ellipsis">...</span>
             )}
             <button
               className="button page-button"

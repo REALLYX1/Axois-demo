@@ -87,6 +87,28 @@ button:disabled {
   box-shadow: 0 0 0 3px rgb(121 104 221 / 12%);
 }
 
+.search-icon {
+  position: relative;
+  width: 18px;
+  height: 18px;
+  flex: 0 0 18px;
+  border: 2px solid #8490a3;
+  border-radius: 50%;
+}
+
+.search-icon::after {
+  position: absolute;
+  right: -5px;
+  bottom: -4px;
+  width: 8px;
+  height: 2px;
+  border-radius: 999px;
+  background: #8490a3;
+  content: "";
+  transform: rotate(45deg);
+  transform-origin: left center;
+}
+
 .search-box input {
   width: 100%;
   padding: 14px 0;

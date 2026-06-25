@@ -9,6 +9,13 @@ export async function getPokemonList(page = 1, limit = 30) {
   return response.data;
 }
 
+export async function getAllPokemonList() {
+  const response = await axiosClient.get("/pokemon", {
+    params: { limit: 100000, offset: 0 },
+  });
+  return response.data;
+}
+
 export async function getPokemonDetails(name) {
   const response = await axiosClient.get(`/pokemon/${name}`);
   return response.data;

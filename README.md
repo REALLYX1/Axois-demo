@@ -49,7 +49,7 @@ PokéAPI phù hợp vì dữ liệu dễ nhận biết, có ảnh minh họa và
 6. Khi bấm một item, `usePokemonDetails` gọi `/pokemon/{name}` và hiển thị ảnh, loại, chiều cao và cân nặng.
 6. Nếu request lỗi, `catch` lưu thông báo vào state `error`. Khối `finally` luôn tắt trạng thái `loading`.
 
-Nút **Tải lại** gọi lại cùng hàm `fetchPokemon`. Các nút số trang, **Trước** và **Sau** đổi state `page`, khiến hook gọi API lại với `offset` mới. Phân trang hiển thị ba trang trước và ba trang sau trang hiện tại. Tìm theo tên lọc trang hiện tại; nhập số Pokédex có dấu `#`, ví dụ `#001` hoặc `#25`, sẽ được chuẩn hóa thành ID số rồi gọi trực tiếp `/pokemon/1` hoặc `/pokemon/25` nên không phụ thuộc vị trí phân trang.
+Nút **Tải lại** gọi lại cùng hàm `fetchPokemon`. Các nút số trang, **Trước** và **Sau** đổi state `page`, khiến hook gọi API lại với `offset` mới. Phân trang hiển thị ba trang trước và ba trang sau trang hiện tại. Tìm theo tên sẽ lọc trên danh sách Pokémon đầy đủ lấy từ API, nên không bị giới hạn trong trang hiện tại. Nhập số Pokédex có dấu `#`, ví dụ `#001` hoặc `#25`, sẽ được chuẩn hóa thành ID số rồi gọi trực tiếp `/pokemon/1` hoặc `/pokemon/25` nên không phụ thuộc vị trí phân trang.
 
 ## Cấu trúc thư mục
 

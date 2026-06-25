@@ -1,8 +1,8 @@
-import { useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useState } from "react";
 import PokemonDetail from "../components/PokemonDetail";
 import PokemonList from "../components/PokemonList";
 import Pagination from "../components/Pagination";
-import { getPokemonDetails } from "../api/pokemonApi";
+import { getAllPokemonList, getPokemonDetails } from "../api/pokemonApi";
 import { usePokemon } from "../hooks/usePokemon";
 
 const ITEMS_PER_PAGE = 30;
@@ -17,16 +17,38 @@ export default function HomePage() {
   const [searchResult, setSearchResult] = useState(null);
   const [searchLoading, setSearchLoading] = useState(false);
   const [searchError, setSearchError] = useState("");
+  const [allPokemon, setAllPokemon] = useState([]);
+  const [allPokemonLoading, setAllPokemonLoading] = useState(true);
+  const [allPokemonError, setAllPokemonError] = useState("");
   const [selectedPokemon, setSelectedPokemon] = useState("");
   const totalPages = Math.ceil(totalPokemon / ITEMS_PER_PAGE);
-  const isIdSearch = searchTerm.trim().startsWith("#");
+  const keyword = searchTerm.trim().toLowerCase();
+  const isIdSearch = keyword.startsWith("#");
+  const isNameSearch = Boolean(keyword) && !isIdSearch;
+
+  useEffect(() => {
+    async function fetchAllPokemon() {
+      try {
+        setAllPokemonLoading(true);
+        setAllPokemonError("");
+        const data = await getAllPokemonList();
+        setAllPokemon(data.results);
+      } catch (requestError) {
+        console.error("Không thể tải danh sách Pokémon đầy đủ:", requestError);
+        setAllPokemonError("Không thể tải danh sách Pokémon đầy đủ để tìm theo tên.");
+      } finally {
+        setAllPokemonLoading(false);
+      }
+    }
+
+    fetchAllPokemon();
+  }, []);
 
   const filteredPokemon = useMemo(() => {
-    const keyword = searchTerm.trim().toLowerCase();
     if (!keyword) return pokemon;
 
-    return pokemon.filter((item) => item.name.includes(keyword));
-  }, [pokemon, searchTerm]);
+    return allPokemon.filter((item) => item.name.includes(keyword));
+  }, [allPokemon, keyword, pokemon]);
 
   const displayedPokemon = isIdSearch
     ? searchResult
@@ -36,22 +58,22 @@ export default function HomePage() {
 
   async function searchPokemon(event) {
     event.preventDefault();
-    const keyword = searchTerm.trim();
+    const keywordValue = searchTerm.trim();
 
     setSearchError("");
 
-    if (/^\d+$/.test(keyword)) {
+    if (/^\d+$/.test(keywordValue)) {
       setSearchResult(null);
       setSearchError("Hãy thêm dấu # trước số Pokédex, ví dụ: #25.");
       return;
     }
 
-    if (!/^#\d+$/.test(keyword)) return;
+    if (!/^#\d+$/.test(keywordValue)) return;
 
     try {
       setSearchLoading(true);
       setSearchResult(null);
-      const pokemonId = Number(keyword.slice(1));
+      const pokemonId = Number(keywordValue.slice(1));
 
       if (!Number.isInteger(pokemonId) || pokemonId < 1) {
         setSearchError("Số Pokédex phải lớn hơn 0, ví dụ: #001.");
@@ -66,7 +88,7 @@ export default function HomePage() {
       });
     } catch (requestError) {
       console.error("Không tìm thấy Pokémon theo số Pokédex:", requestError);
-      setSearchError(`Không tìm thấy Pokémon có số ${keyword}.`);
+      setSearchError(`Không tìm thấy Pokémon có số ${keywordValue}.`);
     } finally {
       setSearchLoading(false);
     }
@@ -96,10 +118,10 @@ export default function HomePage() {
       <form className="toolbar" aria-label="Công cụ tìm kiếm" onSubmit={searchPokemon}>
         <label className="search-box">
           <span className="sr-only">Tìm Pokémon</span>
-          <span aria-hidden="true">⌕</span>
+          <span className="search-icon" aria-hidden="true"></span>
           <input
             type="search"
-            placeholder="Nhập tên hoặc #số Pokédex..."
+            placeholder="Tìm kiếm theo tên hoặc ID"
             value={searchTerm}
             onChange={changeSearchTerm}
           />
@@ -117,7 +139,7 @@ export default function HomePage() {
           onClick={refetch}
           disabled={loading}
         >
-          {loading ? "Đang tải..." : "↻ Tải lại"}
+          {loading ? "Đang tải..." : "Tải lại"}
         </button>
       </form>
 
@@ -125,7 +147,9 @@ export default function HomePage() {
         <p className="result-count">
           {isIdSearch
             ? "Tìm chính xác bằng số Pokédex"
-            : `Hiển thị ${filteredPokemon.length} Pokémon ở trang này · Tổng cộng ${totalPokemon}`}
+            : isNameSearch
+              ? `Hiển thị ${filteredPokemon.length} Pokémon tìm thấy trong toàn bộ API - Tổng cộng ${totalPokemon}`
+              : `Hiển thị ${filteredPokemon.length} Pokémon ở trang này - Tổng cộng ${totalPokemon}`}
         </p>
       )}
 
@@ -135,8 +159,16 @@ export default function HomePage() {
         <p className="status">Đang tìm Pokémon theo số Pokédex...</p>
       )}
 
+      {!loading && isNameSearch && allPokemonLoading && (
+        <p className="status">Đang tải danh sách Pokémon để tìm theo tên...</p>
+      )}
+
       {!loading && searchError && (
         <p className="status status--error" role="alert">{searchError}</p>
+      )}
+
+      {!loading && isNameSearch && allPokemonError && (
+        <p className="status status--error" role="alert">{allPokemonError}</p>
       )}
 
       {!loading && error && (
@@ -148,10 +180,12 @@ export default function HomePage() {
         </div>
       )}
 
-      {!loading && !error && !searchLoading && !searchError && (
+      {!loading && !error && !searchLoading && !searchError && (!isNameSearch || !allPokemonError) && (
         <>
-          <PokemonList pokemon={displayedPokemon} onSelect={setSelectedPokemon} />
-          {!isIdSearch && (
+          {(!isNameSearch || !allPokemonLoading) && (
+            <PokemonList pokemon={displayedPokemon} onSelect={setSelectedPokemon} />
+          )}
+          {!isIdSearch && !isNameSearch && (
             <Pagination
               page={page}
               totalPages={totalPages}
